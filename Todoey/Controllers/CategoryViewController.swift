@@ -26,6 +26,7 @@ class CategoryViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
+        //?? ==> Nil Coalescing Operator (if the optional is empty, then give it this value)
         return categories?.count ?? 1
         
     }
@@ -109,22 +110,13 @@ class CategoryViewController: UITableViewController {
             
             self.save(category: newCategory)
             
-//            if textField.text!.isEmpty == false {
-//                let newCategory = Category(context: self.context)
-//                newCategory.name = textField.text!
-//                self.categoryArray.append(newCategory)
-//                self.saveCategories()
-//            }
-            
-            
         }
         
         alert.addAction(action)
         
-        alert.addTextField { (alertTextField) in
-            alertTextField.placeholder = "Create new category"
-            textField = alertTextField
-            
+        alert.addTextField { (field) in
+            textField = field
+            textField.placeholder = "Add a new category"
         }
         
         present(alert, animated: true, completion: nil)
