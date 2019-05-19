@@ -8,6 +8,7 @@
 
 import UIKit
 import RealmSwift
+import ChameleonFramework
 
 class TodoListViewController: SwipeTableViewController {
 
@@ -24,6 +25,8 @@ class TodoListViewController: SwipeTableViewController {
         super.viewDidLoad()
         
         print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
+        
+        tableView.separatorStyle = .none
 
         searchBar.delegate = self
         
@@ -43,6 +46,17 @@ class TodoListViewController: SwipeTableViewController {
         if let item = todoItems?[indexPath.row] {
             
             cell.textLabel?.text = item.title
+            
+            let indexFloat = CGFloat(indexPath.row)
+            let todoItemsFloat = CGFloat(todoItems!.count)
+            let percentageDarken: CGFloat = indexFloat / todoItemsFloat
+            let colour = HexColor(selectedCategory!.cellColour)
+            let darkenedColour = colour!.darken(byPercentage: percentageDarken / 2)
+
+            cell.backgroundColor = darkenedColour
+            
+            cell.textLabel?.textColor = ContrastColorOf(darkenedColour!, returnFlat: true)
+
             
             //Ternary operator ==>
             //Value = condition ? valueIfTrue : valueIfFalse
@@ -93,7 +107,7 @@ class TodoListViewController: SwipeTableViewController {
                     try self.realm.write {
                         let newItem = Item()
                         newItem.title = textField.text!
-                        newItem.dateCreated = Date()
+//                        newItem.dateCreated = Date()
                         currentCategory.items.append(newItem)
                     }
                 } catch {
@@ -138,7 +152,7 @@ class TodoListViewController: SwipeTableViewController {
     
     func loadItems(){
         
-        todoItems = selectedCategory?.items.sorted(byKeyPath: "title", ascending: true)
+        todoItems = selectedCategory?.items.sorted(byKeyPath: "dateCreated", ascending: true)
         
         tableView.reloadData()
 
