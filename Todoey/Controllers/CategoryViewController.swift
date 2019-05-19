@@ -9,7 +9,7 @@
 import UIKit
 import RealmSwift
 
-class CategoryViewController: UITableViewController {
+class CategoryViewController: SwipeTableViewController {
     
     let realm = try! Realm()
     
@@ -22,6 +22,7 @@ class CategoryViewController: UITableViewController {
         
     }
     
+    
     //MARK: - TableView Datasource Methods
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -30,19 +31,16 @@ class CategoryViewController: UITableViewController {
         return categories?.count ?? 1
         
     }
+
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath)
-        
-        //?? ==> Nil Coalescing Operator
+        let cell = super.tableView(tableView, cellForRowAt: indexPath)
         
         cell.textLabel?.text = categories?[indexPath.row].name ?? "No Categories Added Yet"
         
-        //Ternary operator ==>
-        // value = condtion ? valueIfTrue : valueIfFalse
-        
         return cell
+        
     }
     
     //MARK: - TableView Delegate Methods
@@ -84,14 +82,19 @@ class CategoryViewController: UITableViewController {
         
     }
     
-//        do {
-//            categoryArray = try context.fetch(request)
-//        } catch {
-//            print("Error fetching data from context \(error)")
-//        }
-//
-//    }
+    //MARK: - Delete Data From Swipe
     
+    override func updateModel(at indexPath: IndexPath) {
+        if let categoryForDeletion = self.categories?[indexPath.row] {
+            do {
+                try self.realm.write {
+                    self.realm.delete(categoryForDeletion)
+                }
+            } catch {
+                print("Error deleting category, \(error)")
+            }
+        }
+    }
     
     //MARK: - Add New Categories
 
