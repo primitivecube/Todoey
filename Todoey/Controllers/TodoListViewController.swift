@@ -15,6 +15,8 @@ class TodoListViewController: SwipeTableViewController {
     var todoItems: Results<Item>?
     let realm = try! Realm()
     
+    @IBOutlet weak var searchBar: UISearchBar!
+    
     var selectedCategory: Category? {
         didSet{
             loadItems()
@@ -23,14 +25,39 @@ class TodoListViewController: SwipeTableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
-        
+                
         tableView.separatorStyle = .none
+        
+//        navigationController?.navigationBar.barTintColor = HexColor(selectedCategory!.cellColour)
 
         searchBar.delegate = self
         
+    }
     
+    override func viewWillAppear(_ animated: Bool) {
+        
+        guard let colour = selectedCategory?.cellColour else {fatalError()}
+        
+        title = selectedCategory!.name
+        
+        updateNavBar(withHexCode: colour)
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+
+        updateNavBar(withHexCode: "1D9BF6")
+        
+    }
+    
+    //MARK: - Nav Bar Setup Methods
+    
+    func updateNavBar(withHexCode colourHexCode: String) {
+        guard let colour = HexColor(colourHexCode) else {fatalError()}
+        guard let navBar = navigationController?.navigationBar else {fatalError()}
+        navBar.barTintColor = colour
+        navBar.tintColor = ContrastColorOf(colour, returnFlat: true)
+        navBar.largeTitleTextAttributes = [NSAttributedString.Key.foregroundColor: ContrastColorOf(colour, returnFlat: true)]
+        searchBar.barTintColor = colour
     }
 
     //MARK = Tableview Datasource Methods
@@ -55,7 +82,7 @@ class TodoListViewController: SwipeTableViewController {
 
             cell.backgroundColor = darkenedColour
             
-            cell.textLabel?.textColor = ContrastColorOf(darkenedColour!, returnFlat: true)
+            cell.textLabel?.textColor =  ContrastColorOf(darkenedColour!, returnFlat: true)
 
             
             //Ternary operator ==>
@@ -131,7 +158,7 @@ class TodoListViewController: SwipeTableViewController {
         
     }
     
-    @IBOutlet weak var searchBar: UISearchBar!
+//    @IBOutlet weak var searchBar: UISearchBar!
     
     //MARK - Model Manipulation Methods
     
